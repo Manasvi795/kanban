@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function Task({ column, onClose, onAdd }) {
+function Task({ column, onClose, onAdd, onEdit, task }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [label, setLabel] = useState("");
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setLabel(task.label);
+    } else {
+      setTitle("");
+      setDescription("");
+      setLabel("");
+    }
+  }, [task]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -11,24 +23,32 @@ function Task({ column, onClose, onAdd }) {
       return;
     }
 
-    const task = {
+    const updatedTask = {
       title: title.trim(),
       description: description.trim(),
       label: label.trim(),
       columnId: column.id,
     };
-    onAdd(task);
-    onClose();
+    if (task) {
+      onEdit(updatedTask);
+    } else {
+      onAdd(updatedTask);
+      onClose();
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-5">
-          <h2 className="text-lg font-semibold text-stone-900">Add task</h2>
+          <h2 className="text-lg font-semibold text-stone-900">
+            {task ? "Edit task" : "Add task"}
+          </h2>
 
           <p className="mt-1 text-sm text-stone-500">
-            Adding task to {column.title}
+            {task
+              ? `Editing task in ${column.title}`
+              : `Adding task to ${column.title}`}
           </p>
         </div>
 
